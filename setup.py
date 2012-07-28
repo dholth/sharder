@@ -7,10 +7,16 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
+    'ipaddr',
     'pyramid',
     'pyramid_debugtoolbar',
-    'waitress',
+    'pyramid_jinja2',
+    'pyramid_tm',
     'retools',
+    'SQLAlchemy',
+    'transaction',
+    'waitress',
+    'zope.sqlalchemy',
     ]
 
 setup(name='sharder',

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+{%- block head %}
+  <meta charset="utf-8">
+  <title>{% block title %}{{ title }}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  {%- block css %}
+  <link rel="stylesheet" href="{{request.static_url('sharder:static/reset-fonts-grids.css')}}" />
+  <link rel="stylesheet" href="{{request.static_url('sharder:static/base-min.css')}}" />
+  <link rel="stylesheet" href="{{request.static_url('deform:static/css/form.css')}}">
+  <link rel="stylesheet" href="{{request.static_url('sharder:static/style.css')}}">
+  {%- endblock %}
+{%- endblock %}
+</head>
+<body>
+<div id="doc3" class="yui-t7">
+{% block main %}
+{% endblock %}
+</div>
+{% block js %}
+  <script src="{{request.application_url}}/static/jquery-1.6.4.min.js"></script>
+  <script src="{{request.application_url}}/deform/scripts/deform.js"></script>
+{% endblock %}
+</body>
+</html>

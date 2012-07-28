@@ -1,0 +1,8 @@
+{% extends "base.jinja2" %}
+{% block main %}
+<h1>{{title}}</h1>
+<div class="preview">
+<a href="{{ shard_full }}"><img src="{{ shard }}" /></a>
+</div>
+{{ form | safe }}
+{% endblock %}

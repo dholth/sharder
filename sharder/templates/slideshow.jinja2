@@ -1,0 +1,16 @@
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+<channel>
+<title>{{name}}</title>
+<link>{{link}}</link>
+<description>{{description}}</description>
+<ttl>{{ttl}}</ttl>
+{% for item in items %}
+    <item>
+        <title>{{item.title}}</title>
+        <link>{{item.link}}</link>
+        <media:content url="{{item.url}}" duration="{{item.duration}}" type="{{item.type}}" />
+        <guid>{{item.url}}</guid>
+     </item>
+{% endfor %}
+</channel>
+</rss>

@@ -1,0 +1,10 @@
+{% extends "base.jinja2" %}
+{% block main %}
+<h1>{{title}}</h1>
+<a href="{{request.resource_url(context, 'new')}}">New</a>
+<ul>
+{% for l in links %}
+<li><a href="{{l.link}}">{{l.name}}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

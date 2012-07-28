@@ -1,5 +1,8 @@
 syntax: glob
+.*
 *~
+*.db
+*.db-*
 *.egg
 *.egg-info
 *.orig
