@@ -95,6 +95,13 @@ def main(global_config, **settings):
                     renderer='edit_shard.jinja2',
                     context=tables.Slideshow)
 
+    config.add_view('.views.edit_slideshow_POST',
+                    name='edit',
+                    renderer='edit_shard.jinja2',
+                    context=tables.Slideshow,
+                    permission='post',
+                    request_method='POST')
+
     config.add_view('.views.slideshow',
                     renderer='slideshow.jinja2',
                     context=tables.Slideshow)

@@ -25,7 +25,7 @@ def alphanum_key(s):
 def home(request):
     return {'title':'Sharder'}
 
-def edit_shard(request):    
+def edit_shard(request): 
     shard = request.context
     shardform = Form(schema.Shard(), buttons=('submit',))
     if 'submit' in request.POST:
@@ -127,7 +127,7 @@ def new_slideshow(request):
             tables.DBSession.flush()
             location = u"%s/shows/%d/edit" % \
                 (request.application_url, slideshow.id)
-            return HTTPSeeOther(location)
+            return HTTPSeeOther(location=location)
         except ValidationFailure, e:
             return {'form':Markup(e.render())}
     return {'form':Markup(shardform.render())}
@@ -139,13 +139,30 @@ def new_slideshow(request):
     return {'links':links, 'title':'Shards'}
 
 def edit_slideshow(request):
-    # XXX handle POST!
     context = request.context
     form = Form(schema.Slideshow(), buttons=('submit',))
     appstruct = {'name':context.name, 
                  'slides':[dict(shard=slide.shard_id, duration=slide.duration) for slide in context.slides]}
     return {'form':form.render(appstruct), 'title':'Edit Slideshow'}
 
+def edit_slideshow_POST(request):
+    slideshow = request.context
+    form = Form(schema.Slideshow(), buttons=('submit',))
+    controls = request.POST.items()
+    try:
+        for slide in slideshow.slides:
+            request.db.delete(slide)
+        slideshow.slides = []
+        appstruct = form.validate(controls)
+        for i, data in enumerate(appstruct['slides']):
+            slide = tables.Slide(duration=data['duration'],
+                                 shard_id=data['shard'],
+                                 order=i)
+            slideshow.slides.append(slide)
+        return HTTPSeeOther(location=request.url)
+    except ValidationFailure, e:
+        return {'form':Markup(e.render()), 'title':'Edit Slideshow'}
+        
 def shows(request):
     links = []
     context = request.context
