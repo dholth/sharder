@@ -23,38 +23,9 @@ class Request(pyramid.request.Request):
     @reify
     def db(self):
         return tables.DBSession
-
-def main(global_config, **settings):
-    """ This function returns a Pyramid WSGI application.
-    """
-    engine = engine_from_config(settings, 'sqlalchemy.')
-    tables.DBSession.configure(bind=engine)
-
-    # bw compat
-    settings['rasterize'] = resource_filename('sharder', 
-                                              'support/rasterize.js')
-    settings['jquery'] = resource_filename('sharder', 
-                                           'support/jquery-1.6.4.min.js')
-  
-    with engine.begin() as connection:
-        stucco_evolution.initialize(connection)
-        stucco_evolution.create_or_upgrade_packages(connection, 'sharder')
-
-    config = Configurator(settings=settings,
-                          request_factory=Request,
-                          root_factory=models.make(),
-                          )
-    config.add_static_view('static', 'sharder:static', cache_max_age=3600)
-    config.add_static_view('deform', 'deform:static', cache_max_age=3600)
-
-    config.include('pyramid_jinja2')
     
-    config.add_view('.views.home',
-                    context=models.Sharder,
-                    renderer='home.jinja2')    
-
+def includeme(config):
     # Shards:
-    
     config.add_view('.views.shards',
                     context=models.Shards,
                     renderer='shards.jinja2')
@@ -105,5 +76,36 @@ def main(global_config, **settings):
     config.add_view('.views.slideshow',
                     renderer='slideshow.jinja2',
                     context=tables.Slideshow)
+        
+def main(global_config, **settings):
+    """ This function returns a Pyramid WSGI application.
+    """
+    engine = engine_from_config(settings, 'sqlalchemy.')
+    tables.DBSession.configure(bind=engine)
+
+    # bw compat
+    settings['rasterize'] = resource_filename('sharder', 
+                                              'support/rasterize.js')
+    settings['jquery'] = resource_filename('sharder', 
+                                           'support/jquery-1.6.4.min.js')
+  
+    with engine.begin() as connection:
+        stucco_evolution.initialize(connection)
+        stucco_evolution.create_or_upgrade_packages(connection, 'sharder')
+
+    config = Configurator(settings=settings,
+                          request_factory=Request,
+                          root_factory=models.make(),
+                          )
+    config.add_static_view('static', 'sharder:static', cache_max_age=3600)
+    config.add_static_view('deform', 'deform:static', cache_max_age=3600)
+
+    config.include('pyramid_jinja2')
+    
+    config.add_view('.views.home',
+                    context=models.Sharder,
+                    renderer='home.jinja2')
+
+    config.include('sharder')
 
     return config.make_wsgi_app()

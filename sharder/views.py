@@ -66,15 +66,15 @@ def new_shard(request):
                                   height=appstruct['height'],
                                   triggers=appstruct['triggers'],
                                   )
-            tables.DBSession.add(newshard)
-            tables.DBSession.flush()
+            request.db.add(newshard)
+            request.db.flush()
             location = u"%s/shards/%d/edit" % \
                 (request.application_url, newshard.id)
             log.debug(u"new shard at %s", location)
             return HTTPSeeOther(location)
         except ValidationFailure, e:
             return {'form':Markup(e.render())}
-    return {'form':Markup(shardform.render())}
+    return {'form':Markup(shardform.render()), 'title':u'New Shard'}
 
 def shard(request):
     """Return a picture of part of a page."""
@@ -123,8 +123,8 @@ def new_slideshow(request):
                                      shard_id=data['shard'],
                                      order=i)
                 slideshow.slides.append(slide)
-            tables.DBSession.add(slideshow)
-            tables.DBSession.flush()
+            request.db.add(slideshow)
+            request.db.flush()
             location = u"%s/shows/%d/edit" % \
                 (request.application_url, slideshow.id)
             return HTTPSeeOther(location=location)
@@ -133,17 +133,17 @@ def new_slideshow(request):
     return {'form':Markup(shardform.render())}
 
     links = []
-    for shard in tables.DBSession.query(tables.Shard).all():
+    for shard in request.db.query(tables.Shard).all():
         links.append(dict(name=shard.name, link=u"%s/%d/edit" % 
                           (request.url.rstrip('/'), shard.id), id=shard.id))                            
-    return {'links':links, 'title':'Shards'}
+    return {'links':links, 'title': u'New Slideshow'}
 
 def edit_slideshow(request):
     context = request.context
     form = Form(schema.Slideshow(), buttons=('submit',))
     appstruct = {'name':context.name, 
                  'slides':[dict(shard=slide.shard_id, duration=slide.duration) for slide in context.slides]}
-    return {'form':form.render(appstruct), 'title':'Edit Slideshow'}
+    return {'form':form.render(appstruct), 'title': u'Edit Slideshow'}
 
 def edit_slideshow_POST(request):
     slideshow = request.context
@@ -166,7 +166,7 @@ def edit_slideshow_POST(request):
 def shows(request):
     links = []
     context = request.context
-    for item in tables.DBSession.query(context.__model__).all():
+    for item in request.db.query(context.__model__).all():
         links.append(dict(name=item.name, 
                           link=request.resource_url(context, item.id, 'edit'), 
                           id=item.id))
