@@ -15,7 +15,13 @@ class Locatable(object):
 
 class IntKeyTraverser(object):
     def __getitem__(self, key):
-        session = tables.DBSession
+        item = self
+        session = None
+        while session is None:
+            try:
+                session = item.request.db
+            except AttributeError:
+                item = item.__parent__
         try:
             key = int(key)
         except (ValueError, TypeError):
@@ -50,13 +56,15 @@ class Sharder(object):
                 (Allow, 'group:admin', 'post') ]
     __name__ = ''
     __parent__ = None
-    __children__ = {'shards':Shards, 'shows':Shows} 
+    __children__ = {'shards':Shards, 'shows':Shows}
+    
+    def __init__(self, request):
+        self.request = request 
     
     def __getitem__(self, key):
         return self.__children__[key](name=key, parent=self)
     
 def make():
-    root = Sharder()
     def get_root(request):
-        return root
+        return Sharder(request)
     return get_root

@@ -76,18 +76,21 @@ def includeme(config):
     config.add_view('.views.slideshow',
                     renderer='slideshow.jinja2',
                     context=tables.Slideshow)
+    
+def augment_settings(settings):
+    """Add rasterize, jquery locations to settings"""
+    settings['rasterize'] = resource_filename('sharder', 
+                                              'support/rasterize.js')
+    settings['jquery'] = resource_filename('sharder', 
+                                           'support/jquery-1.6.4.min.js')
         
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     engine = engine_from_config(settings, 'sqlalchemy.')
     tables.DBSession.configure(bind=engine)
-
-    # bw compat
-    settings['rasterize'] = resource_filename('sharder', 
-                                              'support/rasterize.js')
-    settings['jquery'] = resource_filename('sharder', 
-                                           'support/jquery-1.6.4.min.js')
+    
+    augment_settings(settings)
   
     with engine.begin() as connection:
         stucco_evolution.initialize(connection)

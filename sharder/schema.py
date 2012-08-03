@@ -2,6 +2,7 @@
 
 import colander
 from . import tables
+from pyramid import threadlocal
 
 class Shard(colander.MappingSchema):
     name = colander.SchemaNode(colander.String())
@@ -21,7 +22,8 @@ class Shard(colander.MappingSchema):
        missing=0)
 
 def shard_exists(node, value):
-    if not tables.DBSession.query(tables.Shard.id).filter_by(id=value).all():
+    request = threadlocal.get_current_request()
+    if not request.db.query(tables.Shard.id).filter_by(id=value).all():
         raise colander.Invalid(node, "Shard %r does not exist" % value)
 
 class Slide(colander.MappingSchema):
