@@ -154,6 +154,7 @@ def edit_slideshow_POST(request):
             request.db.delete(slide)
         slideshow.slides = []
         appstruct = form.validate(controls)
+        slideshow.name = appstruct['name']
         for i, data in enumerate(appstruct['slides']):
             slide = tables.Slide(duration=data['duration'],
                                  shard_id=data['shard'],
